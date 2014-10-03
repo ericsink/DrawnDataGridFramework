@@ -1,0 +1,314 @@
+﻿
+switch IChanged to rx
+
+more demos.
+
+code/tree cleanup.
+
+need to revamp all the names to be consistent and use
+the right style.
+
+OK, nothing is using func_begin_update.
+
+when notifications come into the datapanel for cells that are
+not visible, ignore them.
+
+The cache objects have comments in func_begin saying that they
+should check to see if the cache is too large, but those are
+not implemented, and it's not clear that func_begin is the
+place to do that anyway.
+
+what'll happen with begin/end for a rowlist if it gets called
+multiple times in a single operation?  like a begin is already
+open, but it gets called again?  this could happen if we
+have multiple display type objects tied to the same value
+object.
+
+so is func_begin really needed?  if not, how have I convinced
+myself that this was important?
+
+maybe func_begin/end will be needed for xaml drawing.  begin_entity?
+
+maybe func_begin/end will be needed to prepare/finalize a sqlite
+statement handle.  but if we're scrolled a lot, that assumes
+the new stmt will be able to jump to the right place or we'll
+have to skip a lot.
+
+can part of the drawvisible cache be moved into an abstract
+class?
+
+don't alloc the 2 edgefinders, the boxgetter, or the cellrange
+on every draw
+
+don't alloc the list + entries in cellrange.subtract.
+
+try to avoid allocation in the constructor for xfgraphics
+
+rowlist_ienumerable using ElementAt ?  it'll be really slow.
+
+alpha/omega ?
+
+the onevalueforeach objects are caches.  they should be named
+as such, and should behave like the others.
+
+we want the ability to run the sqlite query in the background
+and have it automatically notify/update the grid as results
+come in.  RxUI.
+
+need a way to hookup the bool from get_value to change the
+rowcolinfo from infinite to bounded.
+
+OnScroll
+INotifyUserActions
+changed events in the chain
+
+in rowcolinfo, the number/wrap/variable stuff could be observable.
+
+get_value cannot be rx.
+
+why can't we use IObservable for row height?  because we
+don't know how many there are.  infinite scrolling.
+we can't listen on things that don't exist.  so we ask
+for row sizes when we need to know.
+
+same for cell values.  we can't attach an observer to
+a million rows.
+
+using OneCoord/CellCoords for notifications of changes is
+sad.  we want the ability to send more than one.  a range.
+a list.  a list of ranges.
+
+what to do if IRowList runs off the end?  In other words,
+the number of rows starts out infinite because we don't
+know how many there are.  then we find out, because we run
+out of rows.
+
+it still seems like the DataGridBase classes for IGraphics
+and CGContext should share more.  If they at least had some
+common interface methods then actual grid implementations
+would be easier to share.  But things like font and color
+are problematic.
+
+DrawCell_Fill<TGraphics,TColor> doesn't seem all that useful.
+
+RxUI collection
+
+I don't think IGraphics is general enough to do a pie wedge.
+There's no AddArc.  No MoveTo.
+
+move xfGraphics into its own project(s)
+
+try to move chain draw into the base class by requiring the
+subclass to pass a delegate.  allows _chain to be private
+instead of protected.
+
+maybe have a notion of an origin.  nested grids?
+
+need the roundedrect stuff back.  shapes and columnish
+were using it.
+
+the cell value cache could now be used for things like text format info
+as well.
+
+changes to CrossGraphics:
+    drawimage x y
+    offscreen
+    android perf
+    need img dispose
+
+    core text
+    uiImage draw instead of cg image
+    draw string vert align
+    no font metrics
+
+    font from XF
+    color from XF
+    linebreakmode from XF
+    textalignment from XF
+
+now that selections are out of core, we can have multiple
+implementations of them, all with the same interface.  selection
+policy can be determined by choosing a different implementation.
+
+interesting that one layer (cache-pad-fill-text) is so much
+faster than two layers (pad-fill , cache-text).  but not if
+the layers are done at the drawcell level.  maybe the adapter (getbox)
+is just slow.
+
+of course, drawcell layers aren't much different from chains.
+
+need a windows phone renderer
+
+need fling.  and probably bounce.  implemented in the plat-specific
+code.
+
+need cache policy.  max number of cells to keep?  or should we
+just automatically toss anything that moved out of the visible
+range?  or toss based on distance from the visible range?
+
+test the valuepercell cache.
+
+shouldn't something get drawn in the corner where two frozen
+panes meet?
+
+variable sizes need more testing and bug fixing
+
+variable sizes and infinite number are not a good idea together
+
+the single-tap recognizer delay is awful.
+
+it should now be possible to cache the row/column widths/edges.
+only useful for variable sizes.  if rowcolumninfo had funcs to
+just get widths/edges, then the cache could be a passthru.
+
+all these events. +=  make sure the handlers get removed when they need
+to be.
+
+make sure offscreen bitmaps are transparent, filled with transparency 
+before starting.
+
+write a test that draws every cell in several layers, each one
+just adding to the drawing without a fill.
+
+interestingly, a cached cell does not need to be tossed if the
+position of that cell changes.  size, yes.  position?  no.
+
+why do we get so many garbage collections on android?  or is
+it the same but we just see them more because android is printing
+them to the console?
+
+note that we have two ways of doing a background.  we can do a
+drawcell with a passthru.  or we can do a drawcell as a layer.
+
+need an object that does backgrounds with images instead of
+just colors.
+
+seems like layer-based selection highlighting is superior.
+anything in a drawcell draw chain that needs selection info is going
+to cause cache problems.
+
+gradients should just be done with images.
+
+maybe fill should renamed back to fillrect
+
+cell spans could be done as a draw_each_cell handler.  it would
+need an interface it could use to ask for cell span info.  when
+it finds a span, it would doctor up the passthru calls.  the
+spanning cell would get a different rectangle.  and the spanned
+cells would not get called.
+
+if frozen panels want to update anything on a selection in the
+main panel, then listen and update.  this would be managed by the
+DataGrid subclass.
+
+need clearer rules about whether callback implementations can be
+shared.  are they immutable?  when?  maybe some of these handlers
+should keep track of begin/end and throw if begin is called when
+one is already open?
+
+selection interactions:
+
+	tap once selects just one cell
+
+	tap once selects the whole row or column
+
+	tap cell header selects the whole row or column
+
+	in two-tap mode, tap first and last cell of a range
+
+	a selection interaction can replace the selection or it
+	can add to it
+
+	this should be selectable based on what you install as
+	the notify handler, which should be low-level.  and these
+	should be chainable like draw handlers are.
+
+	what about scroll?  should this be replaceable too?
+
+need pinch to zoom.
+
+do we want to send low-level events, like touch-down, touch-move,
+touch-up, outside the component, and let the app do stuff?
+or should we just have modes like:  on touchn down/drag/up, do
+a selection and update it as you go?
+
+one mode might be to just do drag select instead of scroll.  but with
+autoscroll?
+
+how about a two-click selection mode?  click.  then scroll anywhere.
+next click defines the selection.
+
+now how about draw objects for numeric values?
+
+higher level types
+	integer
+	floating point
+	date
+	datetime
+
+	email
+	web link
+	phone number
+	choice (dropdown)
+
+	multiline text
+	image
+
+Most of what you get from richer types is more knowledge about how to
+do a UI for editing a value of that type.  So richer types might not be
+that valuable for a component that doesn't handle editing.
+
+everything except images is rendered as text anyway.  numbers and dates
+can have formatting options.  if it's a number and the formatted form won't
+fit, we could do ####### like excel.  numbers allow formulas.
+
+make sure renderer can cope if the size of a datapanel goes to 0.
+
+dynamic resize of column widths?  or row heights?
+
+it would be nice to be able to include arbitrary controls in a cell, but
+that would require access to things which are not publicly exposed by XF,
+or it would require creating another/parallel widget set, which would be
+silly.
+
+big perf impact with row height for each row, since then we can't multiply
+
+cell drawing isn't clipped.  should it be?  probably a terrible perf hit.
+this could be an option for the draweachcell adapter.  or it could be 
+clipping passthru drawcell.
+
+in-place editing
+
+sorting
+
+column reordering
+
+hierarchical.  expand/collapse regions.
+
+show/hide columns or rows
+
+draw-oriented.  unable to put dropdowns or switches in cells.
+
+animated cell contents?
+
+test on an actual device.  I think we're using a value type as
+a dictionary key, which is bad on iOS.  update:  but it works
+fine.
+
+invalidate less, on android anyway?  but will this cause problems
+with the rest of the screen getting drawn?  it doesn't seem to
+make any different.  Same clip bounds comes to onDraw().  there
+is some suggestion that android catches the clip region in another
+layer of the draw pipeline even though it doesn't pass it down to
+us.
+
+change name of drawvisible to drawrange?
+
+calling Bitmap.Recycle() on Android doesn't seem to work.
+unless I reuse bitmaps, android memory leaks everywhere.
+need the per-cell cache to reuse bitmaps too.  but it has
+nothing to ever let go of a bitmap (yet).
+
+rm logging call during draw
+
+
