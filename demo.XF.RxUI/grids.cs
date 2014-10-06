@@ -25,13 +25,15 @@ using Zumero.DataGrid.XF;
 
 using Xamarin.Forms;
 
+using ReactiveUI;
+
 using Zumero.DataGrid.RxUI;
 
 namespace Zumero.DataGrid.Demo.XF
 {
 	public class ColumnishGrid<T> : Zumero.DataGrid.XF.DataGridBase where T : class
 	{
-		public class ColumnInfo // TODO INotify...
+		public class ColumnInfo // TODO should be a ReactiveObject
 		{
 			public string Title = "Untitled";
 			public double Width = 100;
@@ -222,7 +224,7 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var fmt = new OneValueForEachColumn<MyTextFormat> (new ValuePerCell_FromDelegates<MyTextFormat> (gv_fmt));
 
-			IRowList<T> rowlist = new RowList_Bindable_IList<T>(this, RowsProperty);
+			IRowList<T> rowlist = new RowList_Bindable_ReactiveList<T>(this, RowsProperty);
 
             // TODO it would be better if these propnames were stored separately
             // from the formatting info.
@@ -252,36 +254,27 @@ namespace Zumero.DataGrid.Demo.XF
 			dec = new DrawCell_Chain_Padding (padding1, dec);
 			dec = new DrawCell_Chain_Cache (dec, colinfo, rowinfo);
 
-			var sel = new Selection ();
-
-			var dec_selection = new DrawCell_FillRectIfSelected (sel, Color.FromRgba (0, 255, 0, 120));
-
-			var dh_layers = new DrawVisible_Layers (new IDrawVisible<IGraphics>[] {
-				new DrawVisible_Adapter_DrawCell<IGraphics>(dec),
-				new DrawVisible_Adapter_DrawCell<IGraphics>(dec_selection)
-			});
-
 			Main = new MainPanel(
 				colinfo,
 				rowinfo,
-				dh_layers
+				new DrawVisible_Adapter_DrawCell<IGraphics>(dec)
 			);
-			Notify_DemoToggleSelections.Listen (Main, sel);
-			#if not
-			// TODO the mod happens, but the notification does not
-			_main.SingleTap += (object sender, CellCoords e) => {
-			T r = Rows [e.Row];
-			ColumnInfo ci = Columns[e.Column];
-			var typ = typeof(T);
-			var ti = typ.GetTypeInfo();
-			var p = ti.GetDeclaredProperty(ci.PropertyName);
-			if (p != null)
-			{
-			var val = p.GetValue(r);
-			p.SetValue(r, val.ToString() + "*");
-			}
+			Main.SingleTap += (object sender, CellCoords e) => {
+				// when we get a tap on a cell, append an asterisk to its text.
+				// this should automatically trigger a display update because the
+				// object is a ReactiveObject which tells its ReactiveList which
+				// tells its RowList and so on.
+				T r = Rows [e.Row];
+				ColumnInfo ci = Columns[e.Column];
+				var typ = typeof(T);
+				var ti = typ.GetTypeInfo();
+				var p = ti.GetDeclaredProperty(ci.PropertyName);
+				if (p != null)
+				{
+					var val = p.GetValue(r);
+					p.SetValue(r, val.ToString() + "*");
+				}
 			};
-			#endif
 
 			var bginfo_gray = new ValuePerCell_Steady<Color?> (Color.Gray);
 			Top = new FrozenRowsPanel (
@@ -314,11 +307,11 @@ namespace Zumero.DataGrid.Demo.XF
 		// Rows
 
 		public static readonly BindableProperty RowsProperty = 
-			BindableProperty.Create<ColumnishGrid<T>,IList<T>>(
+			BindableProperty.Create<ColumnishGrid<T>,ReactiveList<T>>(
 				p => p.Rows, null);
 
-		public IList<T> Rows {
-			get { return (IList<T>)GetValue(RowsProperty); }
+		public ReactiveList<T> Rows {
+			get { return (ReactiveList<T>)GetValue(RowsProperty); }
 			set { SetValue(RowsProperty, value); } // TODO disallow invalid values
 		}
 

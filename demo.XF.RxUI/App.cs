@@ -21,28 +21,30 @@ using Zumero.DataGrid.XF;
 
 using Xamarin.Forms;
 
-namespace Zumero.DataGrid.Demo.XF
+using ReactiveUI;
+
+namespace Zumero.DataGrid.Demo.XF.RxUI
 {
 	public class App
 	{
-		// TODO this would need to support INotify* or IObservable?
-		public class WordPair
+		public class WordPair : ReactiveObject
 		{
+			private string _en;
+			private string _sp;
+
 			public string en {
-				get;
-				set;
+				get { return _en; }
+				set { this.RaiseAndSetIfChanged (ref _en, value); }
 			}
 			public string sp {
-				get;
-				set;
+				get { return _sp; }
+				set { this.RaiseAndSetIfChanged (ref _sp, value); }
 			}
 		}
 
 		public static Page GetMainPage ()
 		{
-			Dictionary<string, ContentPage> pages = new Dictionary<string, ContentPage> ();
-
-			pages ["Words"] = new ContentPage {
+			var mainPage = new ContentPage {
 				Content = new ColumnishGrid<WordPair> {
 					BackgroundColor = Color.Black,
 					VerticalOptions = LayoutOptions.FillAndExpand,
@@ -65,7 +67,7 @@ namespace Zumero.DataGrid.Demo.XF
 							HorizontalAlignment = TextAlignment.End,
 						}
 					},
-					Rows = new WordPair[] {
+					Rows = new ReactiveList<WordPair> {
 						new WordPair { en = "drive", sp = "conducir" },
 						new WordPair { en = "speak", sp = "hablar" },
 						new WordPair { en = "give", sp = "dar" },
@@ -81,18 +83,7 @@ namespace Zumero.DataGrid.Demo.XF
 				}
 			};
 
-			var lst = new ListView ();
-			lst.ItemsSource = pages.Keys;
-
-			var mainPage = new ContentPage {
-				Content = lst
-			};
-
 			var nav = new NavigationPage (mainPage);
-
-			lst.ItemSelected += (object sender, SelectedItemChangedEventArgs e) => {
-				nav.PushAsync(pages[e.SelectedItem.ToString()]);
-			};
 
 			return nav;
 		}

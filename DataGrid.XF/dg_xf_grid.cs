@@ -447,9 +447,9 @@ namespace Zumero.DataGrid.XF
 				_obj = obj;
 				_prop = prop;
 
-                                // this only listens for changes to the entire property.  like
-                                // when the entire IList<T> gets replaced.  it is primarily helpful
-                                // when we want to bind from a constructor but the property isn't set yet.
+	            // this only listens for changes to the entire property.  like
+	            // when the entire IList<T> gets replaced.  it is primarily helpful
+	            // when we want to bind from a constructor but the property isn't set yet.
 				obj.PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) => {
 					if (e.PropertyName == prop.PropertyName)
 					{

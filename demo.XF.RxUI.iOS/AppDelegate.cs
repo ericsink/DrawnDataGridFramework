@@ -7,7 +7,7 @@ using MonoTouch.UIKit;
 
 using Xamarin.Forms;
 
-using Zumero.DataGrid.Demo.XF;
+using Zumero.DataGrid.Demo.XF.RxUI;
 
 namespace Zumero.DataGrid.Demo.XF.iOS
 {

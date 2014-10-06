@@ -37,7 +37,11 @@ namespace Zumero.DataGrid.Core
 			_rows = rows;
 			_map = map;
 
-			// TODO listen?  If TRow supported INotifyPropertyChanged, for example
+			rows.changed += (object sender, CellCoords e) => {
+				if (changed != null) {
+					changed(this, e);
+				}
+			};
 		}
 
 		public bool get_value(int col, int row, out TVal val)
