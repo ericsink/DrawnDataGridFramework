@@ -4,10 +4,10 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{EC178D31-250A-4528-9D64-43567BFCD3D6}</ProjectGuid>
+    <ProjectGuid>{C878C348-6409-47E3-8BFC-22F987A4E534}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>demo</RootNamespace>
-    <AssemblyName>demo</AssemblyName>
+    <RootNamespace>demo.XF.RxUI</RootNamespace>
+    <AssemblyName>demo.XF.RxUI</AssemblyName>
     <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -30,19 +30,27 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="grids.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Forms.1.2.3.6257\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.1.2.3.6257\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10\Xamarin.Forms.targets')" />
   <ItemGroup>
-    <Reference Include="SQLitePCL.raw">
-      <HintPath>..\packages\SQLitePCL.raw_basic.0.6.1\lib\portable-net45+netcore45+wp8+MonoAndroid10+MonoTouch10\SQLitePCL.raw.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCL.ugly">
-      <HintPath>..\packages\SQLitePCL.ugly.0.6.2\lib\portable-net45+netcore45+wp8+MonoAndroid10+MonoTouch10\SQLitePCL.ugly.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\DataGrid.XF\DataGrid.XF.csproj">
+      <Project>{136A26E9-4EB9-4399-9379-E06AD94B537B}</Project>
+      <Name>DataGrid.XF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGrid.Core\DataGrid.Core.csproj">
+      <Project>{5736C03A-5385-4596-A33F-6437DF5F2428}</Project>
+      <Name>DataGrid.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGrid.RxUI\DataGrid.RxUI.csproj">
+      <Project>{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}</Project>
+      <Name>DataGrid.RxUI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Xamarin.Forms.Core">
       <HintPath>..\packages\Xamarin.Forms.1.2.3.6257\lib\portable-win+net45+wp80+MonoAndroid10+MonoTouch10\Xamarin.Forms.Core.dll</HintPath>
     </Reference>
@@ -52,19 +60,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataGrid.Core\DataGrid.Core.csproj">
-      <Project>{5736C03A-5385-4596-A33F-6437DF5F2428}</Project>
-      <Name>DataGrid.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataGrid.XF\DataGrid.XF.csproj">
-      <Project>{136A26E9-4EB9-4399-9379-E06AD94B537B}</Project>
-      <Name>DataGrid.XF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataGrid.SQLite\DataGrid.SQLite.csproj">
-      <Project>{9DA04D62-1A9D-4E99-9B48-5DAFEE1B4B22}</Project>
-      <Name>DataGrid.SQLite</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
