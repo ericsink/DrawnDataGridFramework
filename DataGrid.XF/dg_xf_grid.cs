@@ -435,38 +435,7 @@ namespace Zumero.DataGrid.XF
 				};
 			}
 		}
-
-		#if not
-		public class RowList_Rx<T> : IRowList<T>
-		{
-			private readonly ReactiveList<T> _rx;
-
-			public RowList_Rx(ReactiveList<T> rx)
-			{
-				_rx = rx;
-
-				_rx.ItemChanged.Subscribe ();
-
-				_rx.CollectionChanged += (object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => {
-				};
-			}
-
-			public void func_begin_update(CellRange viz)
-			{
-			}
-
-			public void func_end_update()
-			{
-			}
-
-			public T get_value(int row) {
-				return _rx[row];
-			}
-
-			public event EventHandler<CellCoords> changed;
-		}
-		#endif
-
+			
 		public class RowList_Bindable_IList<T> : IRowList<T>
 		{
 			private readonly BindableObject _obj;

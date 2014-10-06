@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGrid.Android", "DataGri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGrid.SQLite", "DataGrid.SQLite\DataGrid.SQLite.csproj", "{9DA04D62-1A9D-4E99-9B48-5DAFEE1B4B22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGrid.RxUI", "DataGrid.RxUI\DataGrid.RxUI.csproj", "{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +209,22 @@ Global
 		{EC178D31-250A-4528-9D64-43567BFCD3D6}.Release|iPhone.Build.0 = Release|Any CPU
 		{EC178D31-250A-4528-9D64-43567BFCD3D6}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{EC178D31-250A-4528-9D64-43567BFCD3D6}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.AppStore|iPhone.Build.0 = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|iPhone.Build.0 = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{F4F1B001-3322-47D7-BC34-0A38EE8A4C4A}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = demo.XF.iOS\demo.XF.iOS.csproj
