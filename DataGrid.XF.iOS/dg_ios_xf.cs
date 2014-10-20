@@ -19,7 +19,7 @@ using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-using XFGraphics;
+using CrossGraphics;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
@@ -71,7 +71,7 @@ namespace Zumero.DataGrid.XF.iOS
 			_container = new FivePanelsView (Element);
 
 			Func<DataPanelView<IGraphics>,IGraphics> f = (DataPanelView<IGraphics> p) => {
-				IGraphics gr = new XFGraphics.CoreGraphics.CoreGraphicsGraphics (
+				IGraphics gr = new CrossGraphics.CoreGraphics.CoreGraphicsGraphics (
 					UIGraphics.GetCurrentContext (), true, p.Bounds.Height);
 				return gr;
 			};

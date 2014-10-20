@@ -58,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="AndroidGraphics.cs" />
     <Compile Include="dg_android_xf.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +81,10 @@
     <ProjectReference Include="..\DataGrid.Android\DataGrid.Android.csproj">
       <Project>{4D21C4CC-5990-454C-8391-EB9FB8AD4545}</Project>
       <Name>DataGrid.Android</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGrid.CrossGraphics\DataGrid.CrossGraphics.csproj">
+      <Project>{0213E153-9FCD-4C24-9B44-F41E61D4AB8D}</Project>
+      <Name>DataGrid.CrossGraphics</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

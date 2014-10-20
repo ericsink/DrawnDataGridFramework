@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using XFGraphics;
+using CrossGraphics;
 
 using Zumero.DataGrid.Core;
+using Zumero.DataGrid.xGraphics;
 using Zumero.DataGrid.XF;
 
 using Xamarin.Forms;
@@ -49,10 +50,10 @@ namespace Zumero.DataGrid.Demo.XF
 			var rowinfo = new Dimension_Rows_SQLite ();
 
 			var mytextfmt = new MyTextFormat {
-				TextFont = this.Font,
-				TextColor = Color.Black,
-				HorizontalTextAlignment = TextAlignment.Center,
-				VerticalTextAlignment = TextAlignment.Center,
+				TextFont = this.Font.ToCrossFont(),
+				TextColor = CrossGraphics.Colors.Black,
+				HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+				VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 			};
 
 			var fmt = new ValuePerCell_Steady<MyTextFormat> (
@@ -60,13 +61,13 @@ namespace Zumero.DataGrid.Demo.XF
 			);
 			PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) => {
 				if (e.PropertyName == A1Grid.FontProperty.PropertyName) {
-					mytextfmt.TextFont = Font;
+					mytextfmt.TextFont = Font.ToCrossFont();
 					fmt.notify_changed(-1, -1);
 				}
 			};
 			var padding1 = new ValuePerCell_Steady<Padding?> (new Padding (1));
 			var padding4 = new ValuePerCell_Steady<Padding?> (new Padding (4));
-			var fill_white = new ValuePerCell_Steady<Color?> (Color.White);
+			var fill_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White);
 
 			var rowlist = new RowList_SQLite_StringArray (stmt);
 			var rowlist_cached = new RowList_Cache<string[]> (rowlist);
@@ -80,7 +81,7 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var sel = new Selection ();
 
-			var dec_selection = new DrawCell_FillRectIfSelected (sel, Color.FromRgba (0, 255, 0, 120));
+			var dec_selection = new DrawCell_FillRectIfSelected (sel, new CrossGraphics.Color (0, 255, 0, 120));
 
 			var dh_layers = new DrawVisible_Layers (new IDrawVisible<IGraphics>[] {
 				new DrawVisible_Adapter_DrawCell<IGraphics>(dec),
@@ -145,10 +146,10 @@ namespace Zumero.DataGrid.Demo.XF
 			var rowinfo = new RowColumnInfo_Steady_BindableProp (this, RowsProperty, RowHeightProperty);
 
 			var mytextfmt = new MyTextFormat {
-				TextFont = this.Font,
-				TextColor = Color.Black,
-				HorizontalTextAlignment = TextAlignment.Center,
-				VerticalTextAlignment = TextAlignment.Center,
+				TextFont = this.Font.ToCrossFont(),
+				TextColor = CrossGraphics.Colors.Black,
+				HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+				VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 			};
 
 			var fmt = new ValuePerCell_Steady<MyTextFormat> (
@@ -156,7 +157,7 @@ namespace Zumero.DataGrid.Demo.XF
 				);
 			PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) => {
 				if (e.PropertyName == A1Grid.FontProperty.PropertyName) {
-					mytextfmt.TextFont = Font;
+					mytextfmt.TextFont = Font.ToCrossFont();
 					fmt.notify_changed(-1, -1);
 				}
 			};
@@ -167,7 +168,7 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var padding1 = new ValuePerCell_Steady<Padding?> (new Padding (1));
 			var padding4 = new ValuePerCell_Steady<Padding?> (new Padding (4));
-			var fill_white = new ValuePerCell_Steady<Color?> (Color.White);
+			var fill_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White);
 
 			dec = new DrawCell_Chain_Padding (padding4, dec);
 			dec = new DrawCell_Fill (fill_white, dec);
@@ -319,7 +320,7 @@ namespace Zumero.DataGrid.Demo.XF
 			var rowinfo = new Dimension_FromDelegate ((int?) null, f, false);
 
 			var bginfo_inset = new ValuePerCell_Steady<Padding?> (new Padding (1));
-			var bginfo_white = new ValuePerCell_Steady<Color?> (Color.White);
+			var bginfo_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White);
 
 			IDrawCell<IGraphics> dec = new DrawCell_Fill (bginfo_white);
 			dec = new DrawCell_Chain_Padding (bginfo_inset, dec);
@@ -338,9 +339,9 @@ namespace Zumero.DataGrid.Demo.XF
 		private const int COUNT = 100;
 		private const double SIZE = 10;
 
-		private static bool get_value(int col, int row, out Color? clr) 
+		private static bool get_value(int col, int row, out CrossGraphics.Color clr) 
 		{
-			clr = Xamarin.Forms.Color.FromRgb (
+			clr = new CrossGraphics.Color (
 				(col / (double) COUNT),
 				(row / (double) COUNT),
 				0.5
@@ -353,7 +354,7 @@ namespace Zumero.DataGrid.Demo.XF
 			var colinfo = new Dimension_Steady(COUNT, SIZE, false);
 			var rowinfo = new Dimension_Steady(COUNT, SIZE, false);
 
-			var colors = new ValuePerCell_FromDelegates<Color?> (get_value);
+			var colors = new ValuePerCell_FromDelegates<CrossGraphics.Color> (get_value);
 
 			var dec = new DrawCell_Fill (colors);
 
@@ -377,16 +378,16 @@ namespace Zumero.DataGrid.Demo.XF
 			var rowinfo = new Dimension_Steady(rows, SIZE, wrap_row);
 
 			var padding1 = new ValuePerCell_Steady<Padding?> (new Padding (1, 1, 1, 1));
-			var fill_white = new ValuePerCell_Steady<Color?> (Color.White);
+			var fill_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White);
 
 			IDrawCell<IGraphics> dec_text = new DrawCell_Text (
 				new ValuePerCell_FromDelegates<string>(myutil.get_delegate()), 
 				new ValuePerCell_Steady<MyTextFormat> (
 					new MyTextFormat {
-						TextFont = Font.SystemFontOfSize (SIZE/3),
-						TextColor = Color.Black,
-						HorizontalTextAlignment = TextAlignment.Center,
-						VerticalTextAlignment = TextAlignment.Center,
+						TextFont = CrossGraphics.Font.SystemFontOfSize ((int) (SIZE/3)),
+						TextColor = CrossGraphics.Colors.Black,
+						HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+						VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 					})
 			);
 
@@ -456,14 +457,14 @@ namespace Zumero.DataGrid.Demo.XF
 				// TODO trigger a redraw
 			};
 
-			var fill_gray = new ValuePerCell_Steady<Color?> (Color.Gray);
+			var fill_gray = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.Gray);
 
 			var frozen_textfmt = new ValuePerCell_Steady<MyTextFormat> (
 				new MyTextFormat {
-					TextFont = Font.SystemFontOfSize (SIZE/3, FontAttributes.Bold),
-					TextColor = Color.Black,
-					HorizontalTextAlignment = TextAlignment.Center,
-					VerticalTextAlignment = TextAlignment.Center,
+					TextFont = CrossGraphics.Font.BoldSystemFontOfSize ((int) (SIZE/3)),
+					TextColor = CrossGraphics.Colors.Black,
+					HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+					VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 				});
 
 			Func<FrozenColumnsPanel> f_c = () => 
@@ -518,9 +519,9 @@ namespace Zumero.DataGrid.Demo.XF
 			public double Width = 100;
 			public string PropertyName = null;
 			public Xamarin.Forms.Font TextFont = Xamarin.Forms.Font.SystemFontOfSize(16);
-			public Xamarin.Forms.Color TextColor = Color.Black;
-			public Xamarin.Forms.Color FillColor = Color.White;
-			public Xamarin.Forms.TextAlignment HorizontalAlignment = TextAlignment.Center;
+			public Xamarin.Forms.Color TextColor = Xamarin.Forms.Color.Black;
+			public Xamarin.Forms.Color FillColor = Xamarin.Forms.Color.White;
+			public Xamarin.Forms.TextAlignment HorizontalAlignment = Xamarin.Forms.TextAlignment.Center;
 		}
 
 		private class myRowInfo : IDimension
@@ -682,17 +683,17 @@ namespace Zumero.DataGrid.Demo.XF
 		private bool gv_fmt(int col, int row, out MyTextFormat v)
 		{
 			v = new MyTextFormat {
-					TextFont = Columns [col].TextFont,
-					TextColor = Columns [col].TextColor,
-					HorizontalTextAlignment = Columns [col].HorizontalAlignment,
-					VerticalTextAlignment = TextAlignment.Start,
+				TextFont = Columns [col].TextFont.ToCrossFont(),
+				TextColor = Columns [col].TextColor.ToCrossColor(),
+				HorizontalTextAlignment = Columns [col].HorizontalAlignment.ToCrossTextAlignment(),
+				VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 				};
 			return true;
 		}
 
-		private bool gv_clr(int col, int row, out Color? v)
+		private bool gv_clr(int col, int row, out CrossGraphics.Color v)
 		{
-			v = Columns [col].FillColor;
+			v = Columns [col].FillColor.ToCrossColor();
 			return true;
 		}
 
@@ -725,8 +726,8 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var padding1 = new ValuePerCell_Steady<Padding?> (new Padding (1, 1, 1, 1));
 			var padding8 = new ValuePerCell_Steady<Padding?> (new Padding (8,8,8,8));
-			IValuePerCell<Color?> bginfo = new ValuePerCell_FromDelegates<Color?> (gv_clr);
-			bginfo = new OneValueForEachColumn<Color?> (bginfo);
+			IValuePerCell<CrossGraphics.Color> bginfo = new ValuePerCell_FromDelegates<CrossGraphics.Color> (gv_clr);
+			bginfo = new OneValueForEachColumn<CrossGraphics.Color> (bginfo);
 
 			dec = new DrawCell_Chain_Padding (padding8, dec);
 			dec = new DrawCell_Fill (bginfo, dec);
@@ -735,7 +736,7 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var sel = new Selection ();
 
-			var dec_selection = new DrawCell_FillRectIfSelected (sel, Color.FromRgba (0, 255, 0, 120));
+			var dec_selection = new DrawCell_FillRectIfSelected (sel, new CrossGraphics.Color (0, 255, 0, 120));
 
 			var dh_layers = new DrawVisible_Layers (new IDrawVisible<IGraphics>[] {
 				new DrawVisible_Adapter_DrawCell<IGraphics>(dec),
@@ -764,7 +765,7 @@ namespace Zumero.DataGrid.Demo.XF
 			};
 			#endif
 
-			var bginfo_gray = new ValuePerCell_Steady<Color?> (Color.Gray);
+			var bginfo_gray = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.Gray);
 			Top = new FrozenRowsPanel (
 				colinfo,
 				new Dimension_Steady(1, 40, false),
@@ -777,10 +778,10 @@ namespace Zumero.DataGrid.Demo.XF
 								new myFrozenGetCellTextValue(this), 
 								new ValuePerCell_Steady<MyTextFormat>(
 									new MyTextFormat {
-									TextFont = Font.SystemFontOfSize(20, FontAttributes.Bold),
-									TextColor = Color.Red,
-										HorizontalTextAlignment= TextAlignment.Center,
-										VerticalTextAlignment = TextAlignment.Center
+										TextFont = CrossGraphics.Font.BoldSystemFontOfSize(20),
+										TextColor = CrossGraphics.Colors.Red,
+										HorizontalTextAlignment= CrossGraphics.TextAlignment.Center,
+										VerticalTextAlignment = CrossGraphics.TextAlignment.Center
 									}
 								)
 							)
@@ -865,17 +866,17 @@ namespace Zumero.DataGrid.Demo.XF
 			var fmt = new ValuePerCell_Steady<MyTextFormat> (
 				new MyTextFormat
 				{
-					TextFont = this.Font,
-					TextColor = Color.Black,
-					HorizontalTextAlignment = TextAlignment.Center,
-					VerticalTextAlignment = TextAlignment.Center,
+					TextFont = this.Font.ToCrossFont(),
+					TextColor = CrossGraphics.Colors.Black,
+					HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+					VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 				});
 
 			IDrawCell<IGraphics> dec = new DrawCell_Text (text, fmt);
 
 			var padding1 = new ValuePerCell_Steady<Padding?> (new Padding (1, 1, 1, 1));
 			var padding4 = new ValuePerCell_Steady<Padding?> (new Padding (4,4,4,4));
-			var fill_white = new ValuePerCell_Steady<Color?> (Color.White);
+			var fill_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White);
 
 			dec = new DrawCell_Chain_Padding (padding4, dec);
 			dec = new DrawCell_Fill (fill_white, dec);
@@ -887,13 +888,13 @@ namespace Zumero.DataGrid.Demo.XF
 				rowinfo,
 				new DrawVisible_Adapter_DrawCell<IGraphics>(dec)
 			);
-			var fill_gray = new ValuePerCell_Steady<Color?> (Color.Gray);
+			var fill_gray = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.Gray);
 			var frozen_textfmt = new ValuePerCell_Steady<MyTextFormat> (
 				                     new MyTextFormat {
-					TextFont = Font.SystemFontOfSize (18, FontAttributes.Bold),
-					TextColor = Color.Black,
-					HorizontalTextAlignment = TextAlignment.Center,
-					VerticalTextAlignment = TextAlignment.Center,
+					TextFont = CrossGraphics.Font.BoldSystemFontOfSize (18),
+					TextColor = CrossGraphics.Colors.Black,
+					HorizontalTextAlignment = CrossGraphics.TextAlignment.Center,
+					VerticalTextAlignment = CrossGraphics.TextAlignment.Center,
 				});
 			var val_rownum = new ValuePerCell_RowNumber ();
 			var val_colnum = new ValuePerCell_ColumnLetters ();
@@ -1013,8 +1014,8 @@ namespace Zumero.DataGrid.Demo.XF
 			var rowinfo = new RowColumnInfo_Steady_BindableProp (this, NumberOfRowsProperty, RowHeightProperty);
 
 			var padding4 = new ValuePerCell_Steady<Padding?> (new Padding (4, 4, 4, 4));
-			var fill_blue = new ValuePerCell_Steady<Color?> (Color.Blue);
-			var fill_white = new ValuePerCell_Steady<Color?> (Color.White); // TODO used to have radius 8
+			var fill_blue = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.Blue);
+			var fill_white = new ValuePerCell_Steady<CrossGraphics.Color> (CrossGraphics.Colors.White); // TODO used to have radius 8
 
 			Func<IDrawCell<IGraphics>,IDrawCell<IGraphics>> f = (IDrawCell<IGraphics> inner) => new DrawCell_Fill (
 				fill_blue, 
@@ -1030,9 +1031,9 @@ namespace Zumero.DataGrid.Demo.XF
 				)
 			);
 
-			var dec_oval = f (new DrawCell_Oval (Color.Red));
-			var dec_arc = f (new DrawCell_PieWedge (Color.Green));
-			var dec_roundedrect = f (new DrawCell_RoundedRect (Color.Yellow));
+			var dec_oval = f (new DrawCell_Oval (CrossGraphics.Colors.Red));
+			var dec_arc = f (new DrawCell_Oval (CrossGraphics.Colors.Green)); // TODO was pie wedge
+			var dec_roundedrect = f (new DrawCell_RoundedRect (CrossGraphics.Colors.Yellow));
 
 			var map = new DisplayTypeMap();
 			map.Add (0, dec_oval);
@@ -1048,7 +1049,7 @@ namespace Zumero.DataGrid.Demo.XF
 
 			var sel = new Selection ();
 
-			var dec_selection = new DrawCell_FillRectIfSelected (sel, Color.FromRgba (0, 255, 0, 120));
+			var dec_selection = new DrawCell_FillRectIfSelected (sel, new CrossGraphics.Color (0, 255, 0, 120));
 
 			var dh_layers = new DrawVisible_Layers (new IDrawVisible<IGraphics>[] {
 				new DrawVisible_Adapter_DrawCell<IGraphics>(dec_cache),

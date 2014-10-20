@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="dg_android.cs" />
+    <Compile Include="AndroidGraphics.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -56,6 +57,10 @@
     <ProjectReference Include="..\DataGrid.Core\DataGrid.Core.csproj">
       <Project>{5736C03A-5385-4596-A33F-6437DF5F2428}</Project>
       <Name>DataGrid.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGrid.CrossGraphics\DataGrid.CrossGraphics.csproj">
+      <Project>{0213E153-9FCD-4C24-9B44-F41E61D4AB8D}</Project>
+      <Name>DataGrid.CrossGraphics</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

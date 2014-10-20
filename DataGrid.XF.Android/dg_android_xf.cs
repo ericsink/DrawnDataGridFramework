@@ -21,7 +21,7 @@ using Android.Graphics;
 using Android.Content;
 using Android.Widget;
 
-using XFGraphics;
+using CrossGraphics;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -61,7 +61,7 @@ namespace Zumero.DataGrid.XF.Android
 			_container = new FivePanelsView (Context, Element);
 
 			Func<Canvas,IGraphics> f = (Canvas cv) => {
-				IGraphics gr = new XFGraphics.Android.AndroidGraphics (cv);
+				IGraphics gr = new CrossGraphics.Android.AndroidGraphics (cv);
 				return gr;
 			};
 

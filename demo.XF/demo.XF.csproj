@@ -66,5 +66,9 @@
       <Project>{9DA04D62-1A9D-4E99-9B48-5DAFEE1B4B22}</Project>
       <Name>DataGrid.SQLite</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataGrid.CrossGraphics\DataGrid.CrossGraphics.csproj">
+      <Project>{0213E153-9FCD-4C24-9B44-F41E61D4AB8D}</Project>
+      <Name>DataGrid.CrossGraphics</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
