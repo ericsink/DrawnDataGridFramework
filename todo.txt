@@ -1,4 +1,15 @@
 ﻿
+fix temp hacks in font conversion for android/ios implementations
+of IGraphics.
+
+italic
+
+xGraphics name
+
+BeginLines ?
+
+Cross font size is an int?
+
 switch IChanged to rx
 
 more demos.
