@@ -88,37 +88,6 @@ namespace CrossGraphics.CoreGraphics
 #endif
 		}
 
-		#if not
-		public void Clear (Color color)
-		{
-			_c.ClearRect (_c.GetClipBoundingBox ());
-		}
-
-		public void FillPolygon (Polygon poly)
-		{
-			var count = poly.Points.Count;
-			_c.MoveTo (poly.Points[0].X, poly.Points[0].Y);
-			for (var i = 1; i < count; i++) {
-				var p = poly.Points[i];
-				_c.AddLineToPoint (p.X, p.Y);
-			}
-			_c.FillPath ();
-		}
-
-		public void DrawPolygon (Polygon poly, float w)
-		{
-			_c.SetLineWidth (w);
-			_c.SetLineJoin (CGLineJoin.Round);
-			_c.MoveTo (poly.Points[0].X, poly.Points[0].Y);
-			for (var i = 1; i < poly.Points.Count; i++) {
-				var p = poly.Points[i];
-				_c.AddLineToPoint (p.X, p.Y);
-			}
-			_c.ClosePath ();
-			_c.StrokePath ();
-		}
-		#endif
-
 		public void FillRoundedRect (float x, float y, float width, float height, float radius)
 		{
 			_c.AddRoundedRect (new RectangleF (x, y, width, height), radius);
@@ -237,71 +206,45 @@ namespace CrossGraphics.CoreGraphics
 
 		Font _lastFont = null;
 
+		UIFont _font_ui = null;
+		CTFont _font_ct = null;
+
+		CTStringAttributes _ct_attr = null;
+
 		public void SetFont (Font f)
 		{
 			if (f != _lastFont) {
 				_lastFont = f;
-				SelectFont ();
+
+				// We have a Xamarin.Forms.Font object.  We need a CTFont.  X.F.Font has
+				// ToUIFont() but not a Core Text version of same.  So we make a UIFont first.
+
+				//_font_ui = _lastFont.ToUIFont ();
+				// TODO temporary hack
+				_font_ui = UIFont.SystemFontOfSize (_lastFont.Size);
+
+				_font_ct = new CTFont (_font_ui.Name, _font_ui.PointSize);
+
+				// With Core Text, it is important that we use a CTStringAttributes() with the
+				// NSAttributedString constructor.
+
+				// TODO maybe we should have the text color be separate, have it be an arg on SetFont?
+
+				_ct_attr = new CTStringAttributes {
+					Font = _font_ct,
+					ForegroundColorFromContext = true,
+					//ForegroundColor = _clr_cg,
+					// ParagraphStyle = new CTParagraphStyle(new CTParagraphStyleSettings() { Alignment = CTTextAlignment.Center })
+				};
 			}
 		}
 		
-		void SelectFont ()
-		{
-			var f = _lastFont;
-			var name = "Helvetica";
-			if (f.FontFamily == "Monospace") {
-				if (f.IsBold) {
-					name = "Courier-Bold";
-				}
-				else {
-					name = "Courier";
-				}
-			}
-			else if (f.FontFamily == "DBLCDTempBlack") {
-#if MONOMAC
-				name = "Courier-Bold";
-#else
-				name = f.FontFamily;
-#endif
-			}
-			else if (f.IsBold) {
-				name = "Helvetica-Bold";
-			}
-			_c.SelectFont (name, f.Size, CGTextEncoding.MacRoman);
-			_c.TextMatrix = _textMatrix;
-		}
-		
-		static Dictionary<string, byte[]> _stringFixups = new Dictionary<string, byte[]>();
-		
-		byte[] FixupString (string s)
-		{
-			byte[] fix;
-			if (_stringFixups.TryGetValue (s, out fix)) {
-				return fix;
-			}
-			else {
-				var n = s.Length;
-				var bad = false;
-				for (var i = 0; i < n && !bad; i++) {
-					bad = ((int)s[i] > 127);
-				}
-				if (bad) {
-					fix = MacRomanEncoding.GetBytes (s.Replace ("\u03A9", "Ohm"));
-					_stringFixups [s] = fix;
-					return fix;
-				}
-				else {
-					return null;
-				}
-			}
-		}
 		
 		public void SetClippingRect (float x, float y, float width, float height)
 		{
 			_c.ClipToRect (new RectangleF (x, y, width, height));
 		}
 
-		#if not
 		// TODO using Core Text here is going to be a huge problem because we have to
 		// change the coordinate system for every call to DrawString rather than changing
 		// it once for all the calls.  Not even sure we have enough info (the height of
@@ -402,62 +345,6 @@ namespace CrossGraphics.CoreGraphics
 
 			_c.RestoreState ();
 		}
-		#endif
-		
-		public void DrawString (string s, float x, float y)
-		{			
-			if (_lastFont == null) return;
-			var fm = GetFontMetrics ();
-			var fix = FixupString (s);
-			
-			if (fix == null) {
-				_c.ShowTextAtPoint (x, y + fm.Height, s);
-			}
-			else {
-				_c.ShowTextAtPoint (x, y + fm.Height, fix);
-			}
-		}
-
-		public void DrawString (string s, float x, float y, float width, float height, LineBreakMode lineBreak, TextAlignment align)
-		{
-			if (_lastFont == null) return;
-			var fm = GetFontMetrics ();
-			var fix = FixupString (s);
-			var xx = x;
-			var yy = y;
-			if (align == TextAlignment.Center) {
-				xx = (x + width / 2) - (fm.StringWidth (s) / 2);
-			}
-			else if (align == TextAlignment.End) {
-				xx = (x + width) - fm.StringWidth (s);
-			}
-			
-			if (fix == null) {
-				_c.ShowTextAtPoint (xx, yy + fm.Height, s);
-			}
-			else {
-				_c.ShowTextAtPoint (xx, yy + fm.Height, fix);
-			}
-		}
-
-		public IFontMetrics GetFontMetrics ()
-		{
-			var f = _lastFont;
-			if (f == null) throw new InvalidOperationException ("Cannot call GetFontMetrics before calling SetFont.");
-
-			var fm = f.Tag as CoreGraphicsFontMetrics;
-			if (fm == null) {
-				fm = new CoreGraphicsFontMetrics ();
-				f.Tag = fm;
-			}
-			
-			if (fm.Widths == null) {
-				fm.MeasureText (_c, _lastFont);
-			}
-			
-			return fm;
-		}
-
 		public void DrawImage (IImage img, float x, float y)
 		{
 			if (img is UIKitImage) {
@@ -492,23 +379,8 @@ namespace CrossGraphics.CoreGraphics
 		public void RestoreState ()
 		{
 			_c.RestoreState ();
-			if (_lastFont != null) {
-				SelectFont ();
-			}
+			// TODO do anything to the font?
 		}
-
-		#if not
-		public IImage ImageFromFile (string filename)
-		{
-#if MONOMAC
-			var img = new NSImage ("Images/" + filename);
-			var rect = new RectangleF (PointF.Empty, img.Size);
-			return new UIKitImage (img.AsCGImage (ref rect, NSGraphicsContext.CurrentContext, new MonoMac.Foundation.NSDictionary ()));
-#else
-			return new UIKitImage (UIImage.FromFile ("Images/" + filename).CGImage);
-#endif
-		}
-		#endif
 
 		public void BeginOffscreen(float width, float height, IImage img)
 		{
@@ -595,38 +467,6 @@ namespace CrossGraphics.CoreGraphics
 		}
 	}
 
-	public static class FontEx
-	{
-		/*public static UIFont CreateUIFont (this Font f)
-		{
-			if (f.FontFamily == "") {
-				return UIFont.FromName (f.FontFamily, f.Size);
-			}
-			else {
-				if ((f.Options & FontOptions.Bold) != 0) {
-					return UIFont.BoldSystemFontOfSize (f.Size);
-				}
-				else {
-					return UIFont.SystemFontOfSize (f.Size);
-				}
-			}
-		}*/
-		
-		/*public static CTFont GetCTFont (this Font f)
-		{
-			var t = f.Tag as CTFont;
-			if (t == null) {
-				if (f.Options == FontOptions.Bold) {
-					t = new CTFont ("Helvetica-Bold", f.Size);
-				} else {
-					t = new CTFont ("Helvetica", f.Size);
-				}
-				f.Tag = t;
-			}
-			return t;
-		}*/
-	}
-
 	public class UIKitImage : IImage
 	{
 #if not
@@ -649,111 +489,8 @@ namespace CrossGraphics.CoreGraphics
 		}
 	}
 
-	public class CoreGraphicsFontMetrics : IFontMetrics
-	{
-		int _height;
-		public float[] Widths;
-		
-		const float DefaultWidth = 8.0f;
-
-		public void MeasureText (CGContext c, Font f)
-		{
-//			Console.WriteLine ("MEASURE {0}", f);
-			
-			c.SetTextDrawingMode (CGTextDrawingMode.Invisible);
-			c.TextPosition = new PointF(0, 0);
-			c.ShowText ("MM");
-			
-			var mmWidth = c.TextPosition.X;
-			
-			_height = f.Size - 5;
-			
-			Widths = new float[0x80];
-
-			for (var i = ' '; i < 127; i++) {
-
-				var s = "M" + ((char)i).ToString() + "M";
-				
-				c.TextPosition = new PointF(0, 0);
-				c.ShowText (s);
-				
-				var sz = c.TextPosition.X - mmWidth;
-				
-				if (sz < 0.1f) {
-					Widths = null;
-					return;
-				}
-				
-				Widths[i] = sz;
-			}
-			
-			c.SetTextDrawingMode (CGTextDrawingMode.Fill);
-		}
-
-		public CoreGraphicsFontMetrics ()
-		{
-		}
-		
-		public int StringWidth (string str, int startIndex, int length)
-		{
-			if (str == null) return 0;
-
-			var end = startIndex + str.Length;
-			if (end <= 0) return 0;
-			
-			if (Widths == null) {
-				return 0;
-			}
-
-			var w = 0.0f;
-
-			for (var i = startIndex; i < end; i++) {
-				var ch = (int)str[i];
-				if (ch < Widths.Length) {
-					w += Widths[ch];
-				}
-				else {
-					w += DefaultWidth;
-				}
-			}
-			return (int)(w + 0.5f);
-		}
-
-		public int Height
-		{
-			get {
-				return _height;
-			}
-		}
-
-		public int Ascent
-		{
-			get {
-				return Height;
-			}
-		}
-
-		public int Descent
-		{
-			get {
-				return 0;
-			}
-		}
-	}
-
 	public static class CGContextEx
 	{
-#if !MONOMAC
-		[System.Runtime.InteropServices.DllImport (MonoTouch.Constants.CoreGraphicsLibrary)]
-		extern static void CGContextShowTextAtPoint(IntPtr c, float x, float y, byte[] bytes, int size_t_length);
-		public static void ShowTextAtPoint (this CGContext c, float x, float y, byte[] bytes)
-		{
-			if (bytes == null)
-				throw new ArgumentNullException ("bytes");
-			CGContextShowTextAtPoint (c.Handle, x, y, bytes, bytes.Length);
-		}
-#endif
-
 		public static void AddRoundedRect (this CGContext c, RectangleF b, float r)
 		{
 			c.MoveTo (b.Left, b.Top + r);
@@ -791,47 +528,5 @@ namespace CrossGraphics.CoreGraphics
 		}
 	}
 	
-	public class MacRomanEncoding {
-		static Dictionary<int, byte> _uniToMac= new Dictionary<int, byte>() {
-			{160, 202}, {161, 193}, {162, 162}, {163, 163}, {165, 180}, {167, 164}, {168, 172}, {169,
-			169}, {170, 187}, {171, 199}, {172, 194}, {174, 168}, {175, 248}, {176, 161}, {177, 177},
-			{180, 171}, {181, 181}, {182, 166}, {183, 225}, {184, 252}, {186, 188}, {187, 200}, {191,
-			192}, {192, 203}, {193, 231}, {194, 229}, {195, 204}, {196, 128}, {197, 129}, {198, 174},
-			{199, 130}, {200, 233}, {201, 131}, {202, 230}, {203, 232}, {204, 237}, {205, 234}, {206,
-			235}, {207, 236}, {209, 132}, {210, 241}, {211, 238}, {212, 239}, {213, 205}, {214, 133},
-			{216, 175}, {217, 244}, {218, 242}, {219, 243}, {220, 134}, {223, 167}, {224, 136}, {225,
-			135}, {226, 137}, {227, 139}, {228, 138}, {229, 140}, {230, 190}, {231, 141}, {232, 143},
-			{233, 142}, {234, 144}, {235, 145}, {236, 147}, {237, 146}, {238, 148}, {239, 149}, {241,
-			150}, {242, 152}, {243, 151}, {244, 153}, {245, 155}, {246, 154}, {247, 214}, {248, 191},
-			{249, 157}, {250, 156}, {251, 158}, {252, 159}, {255, 216}, {305, 245}, {338, 206}, {339,
-			207}, {376, 217}, {402, 196}, {710, 246}, {711, 255}, {728, 249}, {729, 250}, {730, 251},
-			{731, 254}, {732, 247}, {733, 253}, {937, 189}, {960, 185}, {8211, 208}, {8212, 209},
-			{8216, 212}, {8217, 213}, {8218, 226}, {8220, 210}, {8221, 211}, {8222, 227}, {8224, 160},
-			{8225, 224}, {8226, 165}, {8230, 201}, {8240, 228}, {8249, 220}, {8250, 221}, {8260, 218},
-			{8364, 219}, {8482, 170}, {8706, 182}, {8710, 198}, {8719, 184}, {8721, 183}, {8730, 195},
-			{8734, 176}, {8747, 186}, {8776, 197}, {8800, 173}, {8804, 178}, {8805, 179}, {9674, 215},
-			{63743, 240}, {64257, 222}, {64258, 223},
-		};
-		public static byte[] GetBytes (string str)
-		{
-			if (str == null) throw new ArgumentNullException ("str");
-			var n = str.Length;
-			var r = new byte [n];
-			for (var i = 0; i < n; i++) {
-				var ch = (int)str [i];
-				var mac = (byte)'?';
-				if (ch <= 127) {
-					mac = (byte)ch;
-				}
-				else if (_uniToMac.TryGetValue (ch, out mac)) {
-				}
-				else {
-					mac = (byte)'?';
-				}
-				r [i] = mac;
-			}
-			return r;
-		}
-	}
 }
 

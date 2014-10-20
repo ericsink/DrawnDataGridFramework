@@ -340,7 +340,8 @@ namespace Zumero.DataGrid.xGraphics // TODO dislike name
 					(float) width,
 					(float) height, 
 					LineBreakMode.None,
-					fmt.HorizontalTextAlignment
+					fmt.HorizontalTextAlignment,
+					fmt.VerticalTextAlignment
 				);
 			}
 		}

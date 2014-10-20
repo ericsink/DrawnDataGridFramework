@@ -227,6 +227,6 @@ Global
 		{EC178D31-250A-4528-9D64-43567BFCD3D6}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = demo.XF.iOS\demo.XF.iOS.csproj
+		StartupItem = demo.XF.Android\demo.XF.Android.csproj
 	EndGlobalSection
 EndGlobal

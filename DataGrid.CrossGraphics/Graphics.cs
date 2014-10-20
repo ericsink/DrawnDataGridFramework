@@ -33,14 +33,6 @@ namespace CrossGraphics
 
 		void SetColor(Color c);
 
-		#if not
-		void Clear (Color c);
-
-		void FillPolygon(Polygon poly);
-
-		void DrawPolygon(Polygon poly,float w);
-		#endif
-
 		void FillRect(float x,float y,float width, float height);
 
 		void DrawRect(float x, float y, float width, float height, float w);
@@ -66,9 +58,15 @@ namespace CrossGraphics
 		void DrawImage(IImage img, float x, float y);
 		void DrawImage(IImage img, float x, float y, float width, float height);
 
-		void DrawString(string s, float x, float y, float width, float height, LineBreakMode lineBreak, TextAlignment align);
-
-		void DrawString(string s, float x, float y);
+		void DrawString(string s, 
+			float x,
+			float y,
+			float width,
+			float height,
+			LineBreakMode lineBreak, 
+			TextAlignment horizontal_align, 
+			TextAlignment vertical_align
+		);
 		
 		void SaveState();
 		
@@ -79,12 +77,6 @@ namespace CrossGraphics
 		void Scale(float sx, float sy);
 		
 		void RestoreState();
-
-		IFontMetrics GetFontMetrics();
-
-		#if not
-		IImage ImageFromFile(string path);
-		#endif
 
 		void BeginOffscreen (float width, float height, IImage prev);
 		IImage EndOffscreen ();
@@ -102,83 +94,6 @@ namespace CrossGraphics
 		End,
 		//Justified
 	}
-
-	#if not
-	public static class GraphicsEx
-	{
-        public static void DrawString (this IGraphics g, string s, PointF p)
-        {
-            g.DrawString(s, p.X, p.Y);
-        }
-
-		public static void DrawString(this IGraphics g, string s, PointF p, Font f)
-		{
-			g.SetFont (f);
-			g.DrawString (s, p.X, p.Y);
-		}
-
-		public static void DrawString(this IGraphics g, string s, RectangleF p, Font f, LineBreakMode lineBreak, TextAlignment align)
-		{
-			g.SetFont (f);
-			g.DrawString (s, p.Left, p.Top, p.Width, p.Height, lineBreak, align);
-		}
-
-		public static void DrawLine(this IGraphics g, PointF s, PointF e, float w)
-		{
-			g.DrawLine (s.X, s.Y, e.X, e.Y, w);
-		}
-
-		public static void DrawRoundedRect(this IGraphics g, RectangleF r, float radius, float w)
-		{
-			g.DrawRoundedRect (r.Left, r.Top, r.Width, r.Height, radius, w);
-		}
-
-        public static void DrawRoundedRect(this IGraphics g, Rectangle r, float radius, float w)
-        {
-            g.DrawRoundedRect(r.Left, r.Top, r.Width, r.Height, radius, w);
-        }
-
-		public static void FillRoundedRect(this IGraphics g, RectangleF r, float radius)
-		{
-			g.FillRoundedRect (r.Left, r.Top, r.Width, r.Height, radius);
-		}
-
-		public static void FillRoundedRect(this IGraphics g, Rectangle r, float radius)
-		{
-			g.FillRoundedRect (r.Left, r.Top, r.Width, r.Height, radius);
-		}
-
-		public static void FillRect(this IGraphics g, RectangleF r)
-		{
-			g.FillRect (r.Left, r.Top, r.Width, r.Height);
-		}
-
-        public static void FillRect(this IGraphics g, Rectangle r)
-        {
-            g.FillRect(r.Left, r.Top, r.Width, r.Height);
-        }
-
-		public static void DrawRect(this IGraphics g, RectangleF r, float w)
-		{
-			g.DrawRect (r.Left, r.Top, r.Width, r.Height, w);
-		}
-
-        public static void DrawRect(this IGraphics g, Rectangle r, float w)
-        {
-            g.DrawRect(r.Left, r.Top, r.Width, r.Height, w);
-        }
-
-		public static void FillOval(this IGraphics g, RectangleF r)
-		{
-			g.FillOval (r.Left, r.Top, r.Width, r.Height);
-		}
-
-		public static void DrawOval(this IGraphics g, RectangleF r, float w)
-		{
-			g.DrawOval (r.Left, r.Top, r.Width, r.Height, w);
-		}
-	}
-	#endif
 
 	public interface IImage
 	{
@@ -277,25 +192,6 @@ namespace CrossGraphics
 		public override string ToString()
 		{
 			return string.Format ("[Font: FontFamily={0}, Options={1}, Size={2}, Tag={3}]", FontFamily, Options, Size, Tag);
-		}
-	}
-
-	public interface IFontMetrics
-	{
-		int StringWidth(string s, int startIndex, int length);
-
-		int Height { get; }
-
-		int Ascent { get; }
-
-		int Descent { get; }
-	}
-
-	public static class FontMetricsEx
-	{
-		public static int StringWidth (this IFontMetrics fm, string s)
-		{
-			return fm.StringWidth (s, 0, s.Length);
 		}
 	}
 
@@ -414,141 +310,5 @@ namespace CrossGraphics
 		public static readonly Color DarkGray = new Color (64, 64, 64);
 	}
 
-	#if not
-	public class Polygon
-	{
-		public readonly List<PointF> Points;
-
-		public object Tag { get; set; }
-
-		public int Version { get; set; }
-
-		public Polygon ()
-		{
-			Points = new List<PointF> ();
-		}
-
-		public Polygon (int[] xs, int[] ys, int c)
-		{
-			Points = new List<PointF> (c);
-			for (var i = 0; i < c; i++) {
-				Points.Add (new PointF (xs [i], ys [i]));
-			}
-		}
-
-		public int Count {
-			get { return Points.Count; }
-		}
-
-		public void Clear()
-		{
-			Points.Clear ();
-			Version++;
-		}
-
-		public void AddPoint(PointF p)
-		{
-			Points.Add (p);
-			Version++;
-		}
-
-		public void AddPoint(float x, float y)
-		{
-			Points.Add (new PointF (x, y));
-			Version++;
-		}
-	}
-
-    public struct Transform2D
-    {
-        public float M11, M12, M13;
-        public float M21, M22, M23;
-        //public float M31, M32, M33;
-
-        public void Apply (float x, float y, out float xp, out float yp)
-        {
-            xp = M11 * x + M12 * y + M13;
-            yp = M21 * x + M22 * y + M23;
-        }
-
-        public static Transform2D operator * (Transform2D l, Transform2D r)
-        {
-            var t = new Transform2D ();
-
-			t.M11 = l.M11 * r.M11 + l.M12 * r.M21;// +l.M13 * r.M31;
-			t.M12 = l.M11 * r.M12 + l.M12 * r.M22;// +l.M13 * r.M32;
-			t.M13 = l.M11 * r.M13 + l.M12 * r.M23 + l.M13;// *r.M33;
-
-			t.M21 = l.M21 * r.M11 + l.M22 * r.M21;// +l.M23 * r.M31;
-			t.M22 = l.M21 * r.M12 + l.M22 * r.M22;// +l.M23 * r.M32;
-			t.M23 = l.M21 * r.M13 + l.M22 * r.M23 + l.M23;// *r.M33;
-
-            //t.M31 = l.M31 * r.M11 + l.M32 * r.M21 + l.M33 * r.M31;
-            //t.M32 = l.M31 * r.M12 + l.M32 * r.M22 + l.M33 * r.M32;
-            //t.M33 = l.M31 * r.M13 + l.M32 * r.M23 + l.M33 * r.M33;
-
-            return t;
-        }
-
-        public static Transform2D Identity ()
-        {
-            var t = new Transform2D ();
-            t.M11 = 1;
-            t.M22 = 1;
-            //t.M33 = 1;
-            return t;
-        }
-
-        public static Transform2D Translate (float x, float y)
-        {
-            var t = new Transform2D ();
-            t.M11 = 1;
-            t.M22 = 1;
-            //t.M33 = 1;
-            t.M13 = x;
-            t.M23 = y;
-            return t;
-        }
-        public static Transform2D Scale (float x, float y)
-        {
-            var t = new Transform2D ();
-            t.M11 = x;
-            t.M22 = y;
-            //t.M33 = 1;
-            return t;
-        }
-    }
-
-	public static class RectangleEx
-	{
-		public static RectangleF ToRectangleF (this System.Drawing.Rectangle r)
-		{
-			return new RectangleF (r.X, r.Y, r.Width, r.Height);
-		}
-
-		public static System.Drawing.Point GetCenter (this System.Drawing.Rectangle r)
-		{
-			return new System.Drawing.Point (r.Left + r.Width / 2,
-										r.Top + r.Height / 2);
-		}
-
-		public static System.Drawing.PointF GetCenter (this System.Drawing.RectangleF r)
-		{
-			return new System.Drawing.PointF (r.X + r.Width / 2.0f,
-										r.Y + r.Height / 2.0f);
-		}
-
-		public static List<RectangleF> GetIntersections (this List<RectangleF> boxes, RectangleF box)
-		{
-			var r = new List<RectangleF> ();
-			foreach (var b in boxes) {
-				if (b.IntersectsWith (box)) {
-					r.Add (b);
-				}
-			}
-			return r;
-		}
-	}
-	#endif
 }
 
